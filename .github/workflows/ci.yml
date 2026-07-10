@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: typst-community/setup-typst@v4
+      # Smoke-check: every .typ must compile. Tolerates a repo with none yet.
+      - name: Compile all .typ files
+        run: |
+          shopt -s globstar nullglob
+          files=(**/*.typ)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No .typ files to compile — passing."
+            exit 0
+          fi
+          for f in "${files[@]}"; do
+            echo "::group::typst compile $f"
+            typst compile "$f" /tmp/out.pdf
+            echo "::endgroup::"
+          done
