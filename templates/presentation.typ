@@ -1,10 +1,13 @@
-#set page(paper: "presentation-16-9", margin: 1.5cm)
+#import "@preview/touying:0.6.1": *
+#import themes.simple: *
+
+#show: simple-theme.with(aspect-ratio: "16-9")
 #set text(font: "New Computer Modern", size: 20pt)
 
-#let slide(title, body) = [
-  = #title
+#let slide(title, body, notes: none) = [
+  == #title
   #body
-  #pagebreak(weak: true)
+  #if notes != none and notes != "" [#speaker-note[#notes]]
 ]
 
 // === body ===
