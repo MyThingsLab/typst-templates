@@ -3,9 +3,10 @@
 Shared [Typst](https://typst.app) style-anchor templates for MyThingsLab's
 document/presentation tools ([MyTypster](../my-typster), [MyPresentation](../my-presentation)).
 
-Not a `My[X]` tool itself — no code, no Engine call, no CI. Just the anchor
-files each tool reads before drafting, plus the compile-gate the real `typst`
-CLI runs against whatever a tool writes on top of one.
+Not a `My[X]` tool itself — no code, no Engine call. Just the anchor files each
+tool reads before drafting, plus the compile-gate the real `typst` CLI runs
+against whatever a tool writes on top of one. CI compiles every `.typ` file
+here on push/PR (`.github/workflows/ci.yml`).
 
 ## Layout
 
@@ -19,10 +20,12 @@ CLI runs against whatever a tool writes on top of one.
 
 ## Conventions a template must follow
 
-- **Self-contained.** No `#import "@preview/..."` package dependencies —
-  compilation must succeed with no network access, since CI and sandboxed
-  agents may run with no egress. Layout is done with core Typst only (`set`/
-  `show` rules, `align`, `line`, a hand-rolled `slide` function for decks).
+- **Single file.** No local sibling-file imports (`#import "helper.typ"`) —
+  a consuming tool (`my-typster`'s `Workspace`) commits only the one anchor
+  file's rendered output into the target repo, so anything a template
+  depends on must live in that same file. `@preview/...` package imports
+  (e.g. `presentation.typ`'s `touying`) are fine — those resolve from
+  Typst's package registry/cache at compile time, not from this repo's tree.
 - **One header/body split per file**, marked by a literal `// === body ===`
   comment line. Everything above the marker (document/page/text settings,
   any `#import`s) is the style anchor a tool must preserve; everything below
